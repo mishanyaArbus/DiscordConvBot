@@ -1,6 +1,11 @@
 # DiscordConvBot
 Python based bot for premade conversations in discord
 
+Requirements:
+-Python >3.10
+-requests
+-windows-curses
+
 /если выбивает какую-либо ошибку, вы СНАЧАЛА САМИ ГУГЛИТЕ решение а только потом строчите мне/
 
 ***УСТАНОВКА И ЗАПУСК***
