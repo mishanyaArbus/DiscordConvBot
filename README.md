@@ -47,3 +47,6 @@ windows-curses;
 *https://tutorial.djangogirls.org/ru/python_installation/
 
 **http://mojainformatika.ru/studentam-povtias/komandnaya-stroka-windows/143-komanda-smeny-tekushhego-kataloga-cd.html
+
+
+*кстати я так подумал и для вл думаю 10-15% сойдет (с профита продажи или минта) и 50% если вы апаете типу лвл (советую по баксов 50 сливать) *если не согласны то предложения приветствуются*
