@@ -19,4 +19,5 @@ Python based bot for premade conversations in discord
 
 
 *https://tutorial.djangogirls.org/ru/python_installation/
+
 **http://mojainformatika.ru/studentam-povtias/komandnaya-stroka-windows/143-komanda-smeny-tekushhego-kataloga-cd.html
