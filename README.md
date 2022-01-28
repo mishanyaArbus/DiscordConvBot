@@ -5,7 +5,7 @@ Python based bot for premade conversations in discord
 
 ***УСТАНОВКА И ЗАПУСК***
 1. Качаем питон, главное включаем PATH variables при установке*
-2. Качаем все файлы из github и закидываем в одну папку
+2. Качаем файлы main.py и disSendClass.py из github и закидываем в одну папку
 3. Если питон поставили правильно, прописываем команды "pip install windows-curses" и "pip install requests" в кмд
 4. Через кмд переходим в репозиторию бота и прописываем "python main.py"**
 
