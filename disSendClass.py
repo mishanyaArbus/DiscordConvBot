@@ -23,10 +23,11 @@ class disSendClass(threading.Thread):
         self.set_msgfile(self.msg_locs[self.iteration % len(self.msg_locs)])
         self.chat_id = self.chat_ids[self.iteration % len(self.chat_ids)]
         self.delay = int(self.delays[self.iteration % len(self.delays)])
+        self.extra_behavior = int(self.extra_behaviors[self.iteration % len(self.extra_behaviors)])
 
 
 
-    def __init__(self, tokenss, msg_locs, chat_ids, delays, extra_behavior, cfg_name, *args, **kwargs):
+    def __init__(self, tokenss, msg_locs, chat_ids, delays, extra_behaviors, cfg_name, *args, **kwargs):
         super(disSendClass, self).__init__(*args, **kwargs)
         #logs
         logging.basicConfig(filename=f"logs/main_log.log",
@@ -37,7 +38,7 @@ class disSendClass(threading.Thread):
         self.logger.setLevel(logging.DEBUG)
         #end logs
 
-        self.extra_behavior = int(extra_behavior)
+        self.extra_behaviors = extra_behaviors
 
         self.cfg_name = cfg_name
 
@@ -127,6 +128,7 @@ class disSendClass(threading.Thread):
 
                         self.paused = True
                         self.status = "missing access, paused"
+                        w_t = 0
 
                         while self.paused:
                             pass
@@ -134,7 +136,7 @@ class disSendClass(threading.Thread):
                     elif self.extra_behavior > 0:  # wait
 
                         next_time = (datetime.now() + timedelta(seconds=self.extra_behavior)).strftime("%X")
-                        self.status = f"missing access, waiting until {next_time}"
+                        self.status = f"no access, waiting {next_time}"
                         w_t = self.extra_behavior
 
                     else:  # do nothing
