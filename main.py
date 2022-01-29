@@ -32,8 +32,12 @@ def open_cfg(cfg_name):
     tokens = [lines_list[1], lines_list[2]]
     chat_id = lines_list[3]
     delay = lines_list[4]
+    try:
+        extra_behavior = lines_list[5][0]
+    except:
+        extra_behavior = 0
 
-    return tokens, msg_loc, chat_id, delay
+    return tokens, msg_loc, chat_id, delay, extra_behavior
 
 
 threads = []

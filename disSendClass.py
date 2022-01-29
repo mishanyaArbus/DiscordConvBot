@@ -26,7 +26,7 @@ class disSendClass(threading.Thread):
 
 
 
-    def __init__(self, tokenss, msg_locs, chat_ids, delays, cfg_name, *args, **kwargs):
+    def __init__(self, tokenss, msg_locs, chat_ids, delays, extra_behavior, cfg_name, *args, **kwargs):
         super(disSendClass, self).__init__(*args, **kwargs)
         #logs
         logging.basicConfig(filename=f"logs/main_log.log",
@@ -36,6 +36,8 @@ class disSendClass(threading.Thread):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
         #end logs
+
+        self.extra_behavior = int(extra_behavior)
 
         self.cfg_name = cfg_name
 
@@ -89,7 +91,7 @@ class disSendClass(threading.Thread):
                 try:
                     self.resp = self.s[self.total_sent % 2].post(
                         f'https://discord.com/api/v9/channels/{self.chat_id}/messages', json=_data, timeout=2).json()
-                    self.status="wtf (for devs only)"
+                    #self.status="wtf (for devs only)"
                 except:
                     self.status = "no response"
                 finally:
@@ -106,22 +108,41 @@ class disSendClass(threading.Thread):
 
                 w_t = 3
 
-                if self.resp['code']  ==  20016:  # rate limit
+                if self.resp['code'] == 10003:  # wrong chat_id
+                    self.status = "unknown channel"
+
+                elif self.resp['code']  ==  20016:  # rate limit
                     next_time = (datetime.now() + timedelta(seconds=self.resp['retry_after'])).strftime("%X")
                     self.status = f"waiting until {next_time}"
                     w_t=self.resp['retry_after']
-
-                elif self.resp['code'] == 50035:  # wrong msg_id
-                    self.status = "no message found"
-                    self.msg_id = 0
-
-                elif self.resp['code'] == 10003:  # wrong chat_id
-                    self.status = "unknown channel"
 
                 elif self.resp['code'] == 50006:  # empty msg
                     self.status = "skipping empty msg"
                     self.total_sent+=1
                     continue
+
+                elif self.resp['code'] == 50013:  # missing access
+
+                    if self.extra_behavior == -1:  # pause
+
+                        self.paused = True
+                        self.status = "missing access, paused"
+
+                        while self.paused:
+                            pass
+
+                    elif self.extra_behavior > 0:  # wait
+
+                        next_time = (datetime.now() + timedelta(seconds=self.extra_behavior)).strftime("%X")
+                        self.status = f"missing access, waiting until {next_time}"
+                        w_t = self.extra_behavior
+
+                    else:  # do nothing
+                        self.status = "missing access"
+
+                elif self.resp['code'] == 50035:  # wrong msg_id
+                    self.status = "no message found"
+                    self.msg_id = 0
 
                 else:   #unexpected id
                     self.status = "getting unexpected err_id"
