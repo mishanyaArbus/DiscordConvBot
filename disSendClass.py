@@ -20,7 +20,7 @@ class disSendClass(threading.Thread):
             return msg
 
         temp_msg = msg
-        for i in range(self.aug_num):
+        for i in range(int(self.aug_num) if "-" in self.aug_num else random.randint(int(self.aug_num.split("-")[0]), int(self.aug_num.split("-")[1]))):
             temp_rand = random.randint(0, len(msg))
             if random.choice([True, False]):
                 temp_msg = temp_msg[:temp_rand]+temp_rand[temp_rand-1:]
@@ -39,7 +39,7 @@ class disSendClass(threading.Thread):
         self.chat_id = self.chat_ids[self.iteration % len(self.chat_ids)]
         self.delay = int(self.delays[self.iteration % len(self.delays)])
         self.extra_behavior = int(self.extra_behaviors[self.iteration % len(self.extra_behaviors)])
-        self.aug_num = int(self.aug_nums[self.iteration % len(self.aug_nums)])
+        self.aug_num = self.aug_nums[self.iteration % len(self.aug_nums)]
 
 
 
