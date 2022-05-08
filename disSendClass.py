@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from datetime import timedelta
 import logging
+import random
 
 class disSendClass(threading.Thread):
 
@@ -13,8 +14,22 @@ class disSendClass(threading.Thread):
         self.s[0].headers['authorization'] = s_token_I
         self.s[1].headers['authorization'] = s_token_II
 
+    def _perform_aug(self, msg):
+
+        if self.aug_num==0:
+            return msg
+
+        temp_msg = msg
+        for i in range(self.aug_num):
+            temp_rand = random.randint(0, len(msg))
+            if random.choice([True, False]):
+                temp_msg = temp_msg[:temp_rand]+temp_rand[temp_rand-1:]
+            else:
+                temp_msg = temp_msg[:temp_rand-1]+temp_rand[temp_rand:]
+        return temp_msg
+
     def set_msgfile(self, loc):
-        self.msg_set: list = open(loc, 'r', encoding='utf-8').read().splitlines()
+        self.msg_set = [self._perform_aug(msg) for msg in open(loc, 'r', encoding='utf-8').readlines()]
 
     def iterate(self):
         self.iteration += 1
@@ -24,10 +39,11 @@ class disSendClass(threading.Thread):
         self.chat_id = self.chat_ids[self.iteration % len(self.chat_ids)]
         self.delay = int(self.delays[self.iteration % len(self.delays)])
         self.extra_behavior = int(self.extra_behaviors[self.iteration % len(self.extra_behaviors)])
+        self.aug_num = int(self.aug_nums[self.iteration % len(self.aug_nums)])
 
 
 
-    def __init__(self, tokenss, msg_locs, chat_ids, delays, extra_behaviors, cfg_name, *args, **kwargs):
+    def __init__(self, tokenss, msg_locs, chat_ids, delays = [5], extra_behaviors = [0], aug_nums = [0], cfg_name = "Blank", *args, **kwargs):
         super(disSendClass, self).__init__(*args, **kwargs)
         #logs
         logging.basicConfig(filename=f"logs/main_log.log",
@@ -39,6 +55,8 @@ class disSendClass(threading.Thread):
         #end logs
 
         self.extra_behaviors = extra_behaviors
+
+        self.aug_nums = aug_nums
 
         self.cfg_name = cfg_name
 
@@ -78,7 +96,9 @@ class disSendClass(threading.Thread):
                 self.msg_id = 0
                 self.total_sent = 0
 
+
             msg = self.msg_set[self.total_sent]
+
 
             if self.msg_id == 0:
                 _data = {'content': msg, 'tts': False}
@@ -92,7 +112,7 @@ class disSendClass(threading.Thread):
                 try:
                     self.resp = self.s[self.total_sent % 2].post(
                         f'https://discord.com/api/v9/channels/{self.chat_id}/messages', json=_data, timeout=2).json()
-                    #self.status="wtf (for devs only)"
+ 
                 except:
                     self.status = "no response"
                 finally:
@@ -146,12 +166,12 @@ class disSendClass(threading.Thread):
                     self.status = "no message found"
                     self.msg_id = 0
 
-                else:   #unexpected id
+                else:   # unexpected id
                     self.status = "getting unexpected err_id"
 
                 time.sleep(w_t)
                 continue
-            else:   #unexpected response
+            else:   # unexpected response
                 self.logger.error(self.resp)   # logging
 
                 if "message" in self.resp and self.resp["message"].split(":")[0]=="401":
