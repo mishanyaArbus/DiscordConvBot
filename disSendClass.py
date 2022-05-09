@@ -16,16 +16,16 @@ class disSendClass(threading.Thread):
 
     def _perform_aug(self, msg):
 
-        if self.aug_num==0:
+        if self.aug_num=='0':
             return msg
 
         temp_msg = msg
-        for i in range(int(self.aug_num) if "-" in self.aug_num else random.randint(int(self.aug_num.split("-")[0]), int(self.aug_num.split("-")[1]))):
+        for i in range(min(int(self.aug_num) if not "-" in self.aug_num else random.randint(int(self.aug_num.split("-")[0]), int(self.aug_num.split("-")[1])), len(msg)-1)):
             temp_rand = random.randint(0, len(msg))
             if random.choice([True, False]):
-                temp_msg = temp_msg[:temp_rand]+temp_rand[temp_rand-1:]
+                temp_msg = temp_msg[:temp_rand]+temp_msg[temp_rand-1:]
             else:
-                temp_msg = temp_msg[:temp_rand-1]+temp_rand[temp_rand:]
+                temp_msg = temp_msg[:temp_rand-1]+temp_msg[temp_rand:]
         return temp_msg
 
     def set_msgfile(self, loc):
@@ -35,15 +35,15 @@ class disSendClass(threading.Thread):
         self.iteration += 1
 
         self.set_session(self.tokenss[0][self.iteration % len(self.tokenss[0])], self.tokenss[1][self.iteration % len(self.tokenss[1])])
+        self.aug_num = self.aug_nums[self.iteration % len(self.aug_nums)]
         self.set_msgfile(self.msg_locs[self.iteration % len(self.msg_locs)])
         self.chat_id = self.chat_ids[self.iteration % len(self.chat_ids)]
         self.delay = int(self.delays[self.iteration % len(self.delays)])
         self.extra_behavior = int(self.extra_behaviors[self.iteration % len(self.extra_behaviors)])
-        self.aug_num = self.aug_nums[self.iteration % len(self.aug_nums)]
 
 
 
-    def __init__(self, tokenss, msg_locs, chat_ids, delays = [5], extra_behaviors = [0], aug_nums = [0], cfg_name = "Blank", *args, **kwargs):
+    def __init__(self, msg_locs, tokenss, chat_ids, delays = ['5'], extra_behaviors = ['0'], aug_nums = ['0'], cfg_name = "Blank", *args, **kwargs):
         super(disSendClass, self).__init__(*args, **kwargs)
         #logs
         logging.basicConfig(filename=f"logs/main_log.log",
@@ -138,9 +138,13 @@ class disSendClass(threading.Thread):
                     w_t=self.resp['retry_after']
 
                 elif self.resp['code'] == 50006:  # empty msg
+                    self.logger.info(msg)
                     self.status = "skipping empty msg"
                     self.total_sent+=1
                     continue
+
+                elif self.resp['code'] == 0:  # empty msg
+                    self.status = "invalid token"
 
                 elif self.resp['code'] == 50013:  # missing access
 

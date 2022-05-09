@@ -21,7 +21,7 @@ logger.setLevel(logging.DEBUG)
 
 def open_cfg(cfg_name):
     try:
-        lines_list = [line.split(", ") for line in open(cfg_name, 'r', encoding='utf-8').read().splitlines()]
+        lines_list = [line.replace("\n","").split(", ") for line in open(cfg_name, 'r', encoding='utf-8').readlines()]
     except:
         logger.error(f"Failed to load cfg '{cfg_name}'")
         return False
@@ -33,11 +33,11 @@ def open_cfg(cfg_name):
     chat_id = lines_list[3]
     delay = lines_list[4]
     try:
-        extra_behavior = lines_list[5][0]
+        extra_behavior = lines_list[5]
     except:
-        extra_behavior = 0
+        extra_behavior = [0]
 
-    return tokens, msg_loc, chat_id, delay, extra_behavior
+    return [msg_loc, tokens, chat_id, *lines_list[4:]]
 
 
 threads = []
@@ -47,7 +47,7 @@ cfgs = glob("*.cfg")
 
 for cfg in cfgs:
 
-    threads.append(disSendClass(*open_cfg(cfg), cfg))
+    threads.append(disSendClass(*open_cfg(cfg), cfg_name=cfg))
 
     threads[len(threads) - 1].daemon = True
     threads[len(threads) - 1].name = cfg
@@ -135,8 +135,8 @@ def window_func(stdscr):
                 threads[selected_y].paused = 1 - threads[selected_y].paused
         except IndexError:
             logger.error("pressed button on empty space")
-        except:
-            logger.error("unknown error in menu")
+        except Exception as e:
+            logger.error(f"unknown error in menu {e}")
 
         main_win.clear()  # render
 
