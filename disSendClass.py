@@ -104,7 +104,8 @@ class disSendClass(threading.Thread):
                 _data = {'content': msg, 'tts': False}
             else:
                 _data = {'content': msg, 'tts': False,
-                         'message_reference': {'channel_id': self.chat_id, 'message_id': self.msg_id}}
+                         'message_reference': {'channel_id': self.chat_id, 'message_id': self.msg_id},
+                         'nonce':round((datetime.now() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)+981534726682048114}
 
 
             self.status = "trying to send request"
