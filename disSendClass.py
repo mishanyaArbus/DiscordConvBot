@@ -82,6 +82,10 @@ class disSendClass(threading.Thread):
         self.resp = {}
 
     def run(self):
+
+        #small delay for multi start
+        time.sleep(random.randint(1, 10))
+
         self.status = "started"
         while not self.stopped:
             self.status = "new loop"
@@ -101,11 +105,14 @@ class disSendClass(threading.Thread):
 
 
             if self.msg_id == 0:
-                _data = {'content': msg, 'tts': False}
+                _data = {'content': msg, 'tts': False,
+                        #'nonce':round((datetime.now() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)+981534726682048114
+                }
             else:
                 _data = {'content': msg, 'tts': False,
                          'message_reference': {'channel_id': self.chat_id, 'message_id': self.msg_id},
-                         'nonce':round((datetime.now() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)+981534726682048114}
+                         #'nonce':round((datetime.now() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)+981534726682048114
+                }
 
 
             self.status = "trying to send request"
