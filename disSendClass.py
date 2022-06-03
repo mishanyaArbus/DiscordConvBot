@@ -101,6 +101,10 @@ class disSendClass(threading.Thread):
                 self.total_sent = 0
 
 
+            self.s[self.total_sent % 2].post(f"https://discord.com/api/v9/channels/{self.chat_id}/typing")
+            time.sleep(1)
+
+
             msg = self.msg_set[self.total_sent]
 
 
